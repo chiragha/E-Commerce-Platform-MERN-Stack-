@@ -1,12 +1,41 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Autoplay } from "swiper/modules";
-
+import { Link, useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
+
+
 import "swiper/css";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      // ✅ call backend logout
+      await axios.get("http://localhost:4001/api/v1/user/logout", {
+        withCredentials: true,
+      });
+
+      // ✅ clear frontend storage
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      toast.success("Logout successful 👋");
+
+      // ✅ reload to update UI
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1000);
+    } catch (error) {
+      console.log(error);
+      toast.error("Logout failed");
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -44,9 +73,18 @@ const Products = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-12 px-4">
-      <h2 className="text-3xl font-bold mb-10 text-center text-gray-800">
-        Featured Products
-      </h2>
+      <div className="flex justify-between items-center mb-10">
+  <h2 className="text-3xl font-bold text-gray-800">
+    Featured Products
+  </h2>
+
+  <button
+    onClick={() => navigate("/products")}
+    className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+  >
+    Shop All
+  </button>
+</div>
 
       {products.length === 0 ? (
         <p className="text-center text-gray-500">Loading...</p>
@@ -101,9 +139,9 @@ const Products = () => {
                       Out of Stock
                     </button>
                   ) : (
-                    <button className="w-full bg-[#afc6e5] text-black py-2 rounded-lg text-sm font-medium hover:opacity-90 transition cursor-pointer">
+                    <Link to={`/buy/${product._id}`} className="w-full bg-[#afc6e5] text-black py-2 rounded-lg text-sm font-medium hover:opacity-90 transition cursor-pointer">
                       Buy Now
-                    </button>
+                    </Link>
                   )}
                 </div>
               </div>

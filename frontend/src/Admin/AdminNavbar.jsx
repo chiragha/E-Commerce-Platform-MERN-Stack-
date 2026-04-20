@@ -3,14 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-const Navbar = () => {
+const AdminNavbar = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user")) || null;
 
   const handleLogout = async () => {
     try {
       // ✅ call backend logout
-      await axios.get("http://localhost:4001/api/v1/user/logout", {
+      await axios.get("http://localhost:4001/api/v1/admin/logout", {
         withCredentials: true,
       });
 
@@ -35,7 +35,8 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <div className="text-2xl font-bold text-gray-900 cursor-pointer">
-         <Link to="/">E-Shop</Link>
+         <Link to="/
+         ">E-Shop</Link>
         </div>
 
         {/* Menu */}
@@ -58,14 +59,14 @@ const Navbar = () => {
             // ❌ SHOW LOGIN/SIGNUP
             <>
               <Link
-                to="/login"
+                to="/admin/login"
                 className="text-gray-700 hover:text-blue-600 font-medium"
               >
                 Login
               </Link>
 
               <Link
-                to="/signup"
+                to="/admin/signup"
                 className="bg-blue-600 text-white px-4 py-1.5 rounded-md hover:bg-blue-700 transition"
               >
                 Sign Up
@@ -78,4 +79,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default AdminNavbar;

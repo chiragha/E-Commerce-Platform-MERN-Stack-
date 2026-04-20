@@ -2,35 +2,28 @@ import jwt from "jsonwebtoken";
 import config from "../config.js";
 
 function adminAuthenticateToken(req, res, next) {
-    const authHeader = req.headers.authorization;
+  const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ message: "Access denied. No token provided." });
-    }
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "No token provided" });
+  }
 
-    const token = authHeader.split(" ")[1];
+  const token = authHeader.split(" ")[1];
 
-    try {
-        const decoded = jwt.verify(token, config.JWT_ADMIN_PASSWORD);
+  // 🔥 ADD THIS CHECK
+  if (!token || token === "undefined" || token === "null") {
+    return res.status(401).json({ message: "Invalid token format" });
+  }
 
-        // set cookie (optional)
-        const cookieOptions = {
-            expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-        };
+  try {
+    const decoded = jwt.verify(token, config.JWT_ADMIN_PASSWORD);
 
-        res.cookie("token", token, cookieOptions);
+    req.adminId = decoded.id;
 
-        req.adminId = decoded.id;
-
-        next();
-
-    } catch (error) {
-        console.log(error);
-        return res.status(400).json({ message: "Invalid token." });
-    }
+    next();
+  } catch (error) {
+    console.log("JWT ERROR:", error.message);
+    return res.status(401).json({ message: "Invalid token" });
+  }
 }
-
 export default adminAuthenticateToken;

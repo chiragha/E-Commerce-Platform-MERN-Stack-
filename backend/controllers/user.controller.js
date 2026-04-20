@@ -61,43 +61,47 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email: email });
-        const isPasswordValid = await bcrypt.compare(password, user.password);  
+        const user = await User.findOne({ email });
 
-        if (!user || !isPasswordValid) {
-            return res.status(403).json({ errors: "Invalid credentials" });
+        // ✅ FIRST check user
+        if (!user) {
+            return res.status(403).json({ message: "User not found" });
         }
 
-        // jwt code 
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordValid) {
+            return res.status(403).json({ message: "Invalid credentials" });
+        }
+
         const token = jwt.sign(
-            { id: user._id,
-               
-             }, config.JWT_USER_PASSWORD
+            { id: user._id },
+            config.JWT_USER_PASSWORD
         );
-        res.cookie("jwt",token)
-        res.status(201).json({
+
+        res.cookie("jwt", token);
+
+        res.status(200).json({
             message: "Login successful",
-            user: user,
-            token: token
+            user,
+            token
         });
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Server Error" });
     }
-}
+};
 
 // user logout 
 export const logout = (req, res) => {
-   try {
-    if(!req.cookies.jwt){
-        return res.status(400).json({ message: "No active session kindly login" });
-    }
-     res.clearCookie("jwt");
-    res.status(200).json({ message: "Logout successful" });
-   } catch (error) {
-     console.log(error);
-     res.status(500).json({ message: "Server Error" });
-   }
+  try {
+    res.clearCookie("jwt");
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ errors: "Error in logout" });
+    console.log("Error in logout", error);
+  }
 }
 
 
