@@ -26,14 +26,15 @@ app.use(fileUpload({
 }));
 const DB_URI = process.env.MONGO_URI
 
-
 app.use(cors({
-    origin: process.env.FRONTEND_URL, // Adjust this to your frontend URL
-    credentials: true, 
-    method: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-   
-  }));
+  origin: [
+    "http://localhost:5173",
+    "https://e-commerce-platform-mern-stack-pi.vercel.app"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
 try {
   await mongoose.connect(DB_URI)
