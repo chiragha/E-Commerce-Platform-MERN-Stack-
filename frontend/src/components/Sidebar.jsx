@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { BACKEND_URL } from "../utils/utils";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const Sidebar = () => {
     }
 
     try {
-      await axios.get("http://localhost:4001/api/v1/user/logout", {
+      await axios.get("${BACKEND_URL}/user/logout", {
         withCredentials: true,
       });
 
