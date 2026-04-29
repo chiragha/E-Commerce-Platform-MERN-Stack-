@@ -26,14 +26,25 @@ app.use(fileUpload({
 }));
 const DB_URI = process.env.MONGO_URI
 
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://e-commerce-platform-mern-stack-pi.vercel.app"
+];
+
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://e-commerce-platform-mern-stack-pi.vercel.app"
-  ],
+  origin: (origin, callback) => {
+    const allowedOrigins = [
+      "https://e-commerce-platform-mern-stack-pi.vercel.app"
+    ];
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 try {
