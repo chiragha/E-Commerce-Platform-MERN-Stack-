@@ -92,7 +92,14 @@ const CartDrawer = ({ open, setOpen }) => {
       return;
     }
 
-    navigate("/checkout");
+   navigate(
+  `/checkout/${cartItems[0]._id}`,
+  {
+    state: {
+      product: cartItems[0],
+    },
+  }
+);
   }}
   className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-2xl font-semibold hover:scale-[1.02] transition"
 >
