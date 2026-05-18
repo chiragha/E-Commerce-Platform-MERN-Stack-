@@ -17,8 +17,8 @@ const Checkout = () => {
   const [loading, setLoading] = useState(true);
 
   const { productId } = useParams();
-  const location = useLocation();
-  const product = location.state?.product;
+
+  const [product, setProduct] = useState(null);
   // FETCH ADDRESSES
   const fetchAddresses = async () => {
     try {
@@ -44,11 +44,6 @@ const Checkout = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchAddresses();
-  }, []);
-
   const loadScript = (src) => {
     return new Promise((resolve) => {
       const script = document.createElement("script");
@@ -78,7 +73,10 @@ const Checkout = () => {
 
     try {
       const token = localStorage.getItem("token");
-
+      if (!product || !product.price) {
+        toast.error("Product not loaded");
+        return;
+      }
       // create order
       const orderRes = await axios.post(`${BACKEND_URL}/payment/create-order`, {
         amount: product?.price || 0,
@@ -131,6 +129,22 @@ const Checkout = () => {
       toast.error("Payment failed");
     }
   };
+  const fetchProduct = async () => {
+    try {
+      const res = await axios.get(`${BACKEND_URL}/product/${productId}`);
+
+      setProduct(res.data.product);
+    } catch (error) {
+      console.log(error);
+
+      toast.error("Failed to load product");
+    }
+  };
+  useEffect(() => {
+    fetchAddresses();
+    fetchProduct();
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -271,18 +285,18 @@ const Checkout = () => {
                 <span>₹{product?.price || 0}</span>
               </div>
 
-             <button
-  onClick={handlePayment}
-  disabled={!selectedAddress}
-  className={`w-full mt-6 py-4 rounded-2xl font-semibold text-lg flex justify-center items-center gap-2 transition ${
-    selectedAddress
-      ? "bg-gradient-to-r from-orange-500 to-red-500 text-white hover:scale-[1.02]"
-      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-  }`}
->
-  <CreditCard />
-  Continue to Payment
-</button>
+              <button
+                onClick={handlePayment}
+                disabled={!selectedAddress}
+                className={`w-full mt-6 py-4 rounded-2xl font-semibold text-lg flex justify-center items-center gap-2 transition ${
+                  selectedAddress
+                    ? "bg-gradient-to-r from-orange-500 to-red-500 text-white hover:scale-[1.02]"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+              >
+                <CreditCard />
+                Continue to Payment
+              </button>
             </div>
           </div>
         </div>

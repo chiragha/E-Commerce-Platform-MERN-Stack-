@@ -6,8 +6,12 @@ import { Cart } from "../models/cart.model.js";
 // CREATE ORDER
 export const createOrder = async (req, res) => {
   try {
-    const { amount } = req.body;
-
+    const amount = Number(req.body.amount);
+    if (!amount || amount < 1) {
+      return res.status(400).json({
+        message: "Invalid amount",
+      });
+    }
     const options = {
       amount: amount * 100,
       currency: "INR",
@@ -27,7 +31,6 @@ export const createOrder = async (req, res) => {
     });
   }
 };
-
 
 // VERIFY PAYMENT
 export const verifyPayment = async (req, res) => {
