@@ -1,80 +1,79 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import productRoute from './routes/product.route.js';
-import userRoute from './routes/user.route.js';
-import adminRoute from './routes/admin.route.js';
-import fileUpload from 'express-fileupload';
-import { v2 as cloudinary } from 'cloudinary';
+import express from "express";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import productRoute from "./routes/product.route.js";
+import userRoute from "./routes/user.route.js";
+import adminRoute from "./routes/admin.route.js";
+import fileUpload from "express-fileupload";
+import { v2 as cloudinary } from "cloudinary";
 import cookieParser from "cookie-parser";
-import cors from 'cors';
-dotenv.config()
+import cors from "cors";
+import addressRoute from "./routes/address.route.js";
+import paymentRoute from "./routes/payment.route.js";
+import { Server } from "socket.io";
+import cartRoute from "./routes/cart.route.js";
+import userRoutes from "./routes/user.route.js";
+dotenv.config();
 
+const app = express();
+const port = process.env.PORT || 3000;
 
-
-const app = express()
-const port = process.env.PORT || 3000
-// Add this line
 app.use("/uploads", express.static("uploads"));
-// middleware 
-app.use(express.json())
-
+app.use(express.json());
 app.use(cookieParser());
-app.use(fileUpload({
-    useTempFiles : true,
-    tempFileDir : '/tmp/'
-}));
-const DB_URI = process.env.MONGO_URI
 
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  }),
+);
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://e-commerce-platform-mern-stack-pi.vercel.app"
-];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    const allowedOrigins = [
-      "https://e-commerce-platform-mern-stack-pi.vercel.app"
-    ];
-
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 
 try {
-  await mongoose.connect(DB_URI)
-  console.log("CONNECTED TO MONGOOSE")
+  await mongoose.connect(process.env.MONGO_URI);
+  console.log("CONNECTED TO MONGODB");
 } catch (error) {
-console.log(error)
+  console.error("MongoDB Error:", error.message);
 }
 
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET,
+});
+
+app.use("/api/v1/product", productRoute);
+app.use("/api/v1/user", userRoute);
+app.use("/api/v1/admin", adminRoute);
+app.use("/api/v1/address", addressRoute);
+app.use("/api/v1/payment", paymentRoute);
+app.use("/api/v1/cart", cartRoute);
 
 
-// routes 
-app.use("/api/v1/product" , productRoute);
+const server = app.listen(port, () => {
+  console.log(`Server running on ${port}`);
+});
 
-//user route
-app.use("/api/v1/user" , userRoute);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  },
+});
 
-// admin route 
-app.use("/api/v1/admin" , adminRoute);
+io.on("connection", (socket) => {
+  console.log("User Connected");
 
+  socket.on("disconnect", () => {
+    console.log("User Disconnected");
+  });
+});
 
-// Configuration
-    cloudinary.config({ 
-        cloud_name: process.env.cloud_name, 
-        api_key: process.env.api_key, 
-        api_secret: process.env.api_secret 
-    });
-
-
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`)
-})
+export { io };

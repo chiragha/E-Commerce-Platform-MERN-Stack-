@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {BACKEND_URL} from "../utils/utils";
-
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -153,12 +153,12 @@ const Signup = () => {
             </div>
 
             {/* Login Link */}
-            <p className="text-sm text-center">
+            <Link to="/login" className="text-sm text-center">
               Already have an account?{" "}
               <span className="text-indigo-600 cursor-pointer hover:underline">
                 Login
               </span>
-            </p>
+            </Link>
           </div>
         </div>
       </div>

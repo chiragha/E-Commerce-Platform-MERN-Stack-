@@ -21,8 +21,6 @@ function userAuthenticateToken(req, res, next) {
             sameSite: "strict",
         };
 
-        res.cookie("token", token, cookieOptions);
-
         req.userId = decoded.id;
 
         next();

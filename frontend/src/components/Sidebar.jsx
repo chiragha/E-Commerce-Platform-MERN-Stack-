@@ -1,31 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { BACKEND_URL } from "../utils/utils";
+import {
+  FaHome,
+  FaShoppingBag,
+  FaCog,
+  FaShoppingCart,
+  FaSignOutAlt,
+  FaSignInAlt,
+} from "react-icons/fa";
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // ✅ Check token once when component loads
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
   }, []);
 
-  // ✅ Logout handled ONLY here
   const handleLogout = async () => {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      toast.error("You are not logged in");
-      navigate("/login");
-      return;
-    }
-
     try {
-      await axios.get("${BACKEND_URL}/user/logout", {
+      await axios.get(`${BACKEND_URL}/user/logout`, {
         withCredentials: true,
       });
 
@@ -42,45 +42,83 @@ const Sidebar = () => {
     }
   };
 
+  const menuItems = [
+    {
+      name: "Home",
+      icon: <FaHome />,
+      path: "/",
+    },
+    {
+      name: "Products",
+      icon: <FaShoppingBag />,
+      path: "/products",
+    },
+    {
+      name: "Purchases",
+      icon: <FaShoppingCart />,
+      path: "/purchases",
+    },
+    {
+      name: "Settings",
+      icon: <FaCog />,
+      path: "/settings",
+    },
+  ];
+
   return (
-    <div className="w-64 bg-white shadow-md p-6 hidden md:block">
-      <h2 className="text-xl font-bold mb-6">Profile</h2>
+    <aside className="hidden md:flex w-72 min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950 text-white flex-col p-6 shadow-2xl sticky top-0">
+      
+      {/* Logo */}
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+          E-Shop
+        </h1>
 
-      <ul className="space-y-4 text-gray-700">
-        <li onClick={() => navigate("/")} className="cursor-pointer hover:text-blue-600">
-          🏠 Home
-        </li>
+        <p className="text-gray-400 text-sm mt-2">
+          Welcome back 👋
+        </p>
+      </div>
 
-        <li onClick={() => navigate("/products")} className="cursor-pointer hover:text-blue-600">
-          🛍️ Products
-        </li>
-
-        <li onClick={() => navigate("/purchases")} className="cursor-pointer hover:text-blue-600">
-          🛒 Purchases
-        </li>
-
-        <li onClick={() => navigate("/settings")} className="cursor-pointer hover:text-blue-600">
-          ⚙️ Settings
-        </li>
-
-        {/* ✅ Dynamic Login / Logout */}
-        {isLoggedIn ? (
+      {/* Menu */}
+      <ul className="space-y-3 flex-1">
+        {menuItems.map((item, index) => (
           <li
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-1.5 rounded-md hover:bg-red-600 cursor-pointer"
+            key={index}
+            onClick={() => navigate(item.path)}
+            className={`flex items-center gap-4 px-4 py-3 rounded-2xl cursor-pointer transition-all duration-300
+            ${
+              location.pathname === item.path
+                ? "bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg"
+                : "hover:bg-white/10"
+            }`}
           >
-            Logout
+            <span className="text-lg">{item.icon}</span>
+            <span className="font-medium">{item.name}</span>
           </li>
-        ) : (
-          <li
-            onClick={() => navigate("/login")}
-            className="bg-green-500 text-white px-4 py-1.5 rounded-md hover:bg-green-600 cursor-pointer"
-          >
-            Login
-          </li>
-        )}
+        ))}
       </ul>
-    </div>
+
+      {/* Login / Logout */}
+      <div className="mt-auto">
+        {isLoggedIn ? (
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 py-3 rounded-2xl font-semibold transition duration-300"
+          >
+            <FaSignOutAlt />
+            Logout
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate("/login")}
+            className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 py-3 rounded-2xl font-semibold transition duration-300"
+          >
+            <FaSignInAlt />
+            Login
+          </button>
+        )}
+      </div>
+    </aside>
   );
 };
 

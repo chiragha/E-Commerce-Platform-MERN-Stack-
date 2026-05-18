@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import {BACKEND_URL} from "../utils/utils";
+import { Link } from "react-router-dom";
 
 
 const Login = () => {
@@ -137,12 +138,12 @@ const Login = () => {
             </div>
 
             {/* Signup Redirect */}
-            <p className="text-sm text-center">
+            <Link to="/signup" className="text-sm text-center">
               Don’t have an account?{" "}
               <span className="text-indigo-600 cursor-pointer hover:underline">
                 Sign Up
               </span>
-            </p>
+            </Link>
           </div>
         </div>
       </div>

@@ -1,1 +1,1 @@
-export const BACKEND_URL = "https://e-commerce-platform-mern-stack.onrender.com/api/v1";
+export const BACKEND_URL = "http://localhost:4001/api/v1";
