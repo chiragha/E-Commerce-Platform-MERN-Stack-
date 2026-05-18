@@ -94,3 +94,54 @@ E-COMMERCE/
 │── frontend/
 │── backend/
 │── README.md
+```
+###🔐 Environment Variables
+
+- Frontend (.env)
+
+```
+VITE_BACKEND_URL=your_backend_url
+VITE_RAZORPAY_KEY=your_razorpay_key
+
+```
+- Backend (.env)
+  
+ ```
+PORT=4001
+MONGO_URI=your_mongodb_connection
+JWT_USER_PASSWORD=your_jwt_secret
+
+CLOUD_NAME=your_cloudinary_name
+API_KEY=your_cloudinary_key
+API_SECRET=your_cloudinary_secret
+
+RAZORPAY_KEY_ID=your_key_id
+RAZORPAY_SECRET=your_secret
+
+FRONTEND_URL=your_frontend_url
+
+```
+### ⚙️ Installation & Setup
+
+- Clone Repository 
+
+```
+Clone Repository
+```
+- Frontend Setup
+  
+ ```
+cd frontend
+npm install
+npm run dev
+
+```
+
+- Backend Setup
+  
+```
+cd backend
+npm install
+npm run server
+
+```
